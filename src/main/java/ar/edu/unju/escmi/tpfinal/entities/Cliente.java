@@ -1,14 +1,43 @@
 package ar.edu.unju.escmi.tpfinal.entities;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table (name = "clientes")
 public class Cliente {
+	@Id
+	@GeneratedValue ( strategy = GenerationType.IDENTITY)
+	@Column (name = "cli_id")
 	private Long id;
+	@Column (name = "cli_dni", unique = true)
 	private Long dni;
+	@Column (name = "cli_nombre", nullable = false)
 	private String nombre;
+	@Column (name = "cli_apellido")
 	private String apellido;
+	@Column (name = "cli_domicilio")
 	private String domicilio;
+	@Column (name = "telefono")
 	private String telefono;
+	@Column (name = "cli_estado")
 	private boolean estado;
 	
+	public Cliente(Long dni, String nombre, String apellido, String domicilio, String telefono,
+			boolean estado) {
+		super();
+		this.dni = dni;
+		this.nombre = nombre;
+		this.apellido = apellido;
+		this.domicilio = domicilio;
+		this.telefono = telefono;
+		this.estado = estado;
+	}
+
 	public Long getId() {
 		return id;
 	}
