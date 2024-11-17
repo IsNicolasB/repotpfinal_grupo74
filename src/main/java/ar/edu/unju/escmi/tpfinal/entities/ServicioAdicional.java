@@ -1,4 +1,4 @@
-package entities;
+package ar.edu.unju.escmi.tpfinal.entities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
