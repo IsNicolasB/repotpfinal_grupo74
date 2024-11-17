@@ -2,17 +2,18 @@ package ar.edu.unju.escmi.tpfinal.main;
 
 import java.util.List;
 import java.util.Scanner;
-
 import javax.persistence.NoResultException;
-
 import ar.edu.unju.escmi.tpfinal.entities.Cliente;
+import ar.edu.unju.escmi.tpfinal.entities.Salon;
 import ar.edu.unju.escmi.tpfinal.dao.IClienteDao;
+import ar.edu.unju.escmi.tpfinal.dao.ISalonDao;
 import ar.edu.unju.escmi.tpfinal.dao.imp.ClienteDaoImp;
+import ar.edu.unju.escmi.tpfinal.dao.imp.SalonDaoImp;
 
 public class Main {
 	public static Scanner scanner = new Scanner(System.in);
 	public static IClienteDao clienteDao = new ClienteDaoImp();
-
+	public static ISalonDao salonDao = new SalonDaoImp();
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -39,6 +40,7 @@ public class Main {
 			case 7:
 				break;
 			case 8:
+				consultarSalones();
 				break;
 			case 9:
 				break;
@@ -240,5 +242,10 @@ public static void modificarCliente() {
 		}while(opcion != 4);
 		
 		clienteDao.modificarCliente(cliente);
+	}
+	
+	public static void consultarSalones() {
+		List<Salon> salones = salonDao.obtenerSalones();
+		salones.stream().forEach(System.out::println);
 	}
 }
