@@ -30,8 +30,7 @@ public class ServicioAdicional {
     }
 
     
-    public ServicioAdicional(Long id, String descripcion, double precio, boolean estado) {
-        this.id = id;
+    public ServicioAdicional(String descripcion, double precio, boolean estado) {
         this.descripcion = descripcion;
         this.precio = precio;
         this.estado = estado;
@@ -42,9 +41,6 @@ public class ServicioAdicional {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getDescripcion() {
         return descripcion;
