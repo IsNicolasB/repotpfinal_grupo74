@@ -8,6 +8,7 @@ import javax.persistence.TypedQuery;
 import ar.edu.unju.escmi.tpfinal.config.EmfSingleton;
 import ar.edu.unju.escmi.tpfinal.dao.IClienteDao;
 import ar.edu.unju.escmi.tpfinal.entities.Cliente;
+import ar.edu.unju.escmi.tpfinal.exceptions.ClienteNoEncontradoException;
 
 public class ClienteDaoImp implements IClienteDao {
 
@@ -46,8 +47,12 @@ public class ClienteDaoImp implements IClienteDao {
 	}
 
 	@Override
-	public Cliente obtenerCliente(Long clienteId) {
-		return manager.find(Cliente.class, clienteId);
+	public Cliente obtenerCliente(Long clienteId) throws ClienteNoEncontradoException{
+		Cliente cliente =  manager.find(Cliente.class, clienteId);
+		if (cliente == null) {
+	        throw new ClienteNoEncontradoException("Cliente con ID " + clienteId + " no encontrado.");
+	    }
+	    return cliente;
 	}
 
 	@Override
