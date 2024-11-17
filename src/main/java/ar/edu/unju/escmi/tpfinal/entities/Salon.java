@@ -19,9 +19,9 @@ public class Salon {
 	private String nombre;
 	@Column (name = "sal_capacidad", nullable = false)
 	private int capacidad;
-	@Column (name = "sal_pileta")
+	@Column (name = "sal_pileta", nullable = false)
 	private boolean conPileta;
-	@Column (name = "sal_precio")
+	@Column (name = "sal_precio", nullable = false)
     private double precio;
 	
 	public Salon() {
