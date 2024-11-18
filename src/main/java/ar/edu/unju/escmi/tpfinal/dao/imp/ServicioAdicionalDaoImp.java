@@ -1,7 +1,10 @@
 package ar.edu.unju.escmi.tpfinal.dao.imp;
 
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
+import ar.edu.unju.escmi.tpfinal.config.EmfSingleton;
 import ar.edu.unju.escmi.tpfinal.dao.IServicioAdicionalDao;
 import ar.edu.unju.escmi.tpfinal.entities.ServicioAdicional;
 
