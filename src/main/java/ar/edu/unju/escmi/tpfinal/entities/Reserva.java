@@ -46,7 +46,7 @@ public class Reserva {
 	 @Column(name = "res_monto_pagado")
 	 private double montoPagado;
 
-	 @OneToMany(mappedBy = "reserva", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	 @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
 	 private List<ServicioAdicional> serviciosAdicionales;
 
 	 @Column(name = "res_pago_adelantado")
