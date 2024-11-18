@@ -1,20 +1,25 @@
 package ar.edu.unju.escmi.tpfinal.main;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 import javax.persistence.NoResultException;
 import ar.edu.unju.escmi.tpfinal.entities.Cliente;
+import ar.edu.unju.escmi.tpfinal.entities.Reserva;
 import ar.edu.unju.escmi.tpfinal.entities.Salon;
+import ar.edu.unju.escmi.tpfinal.utils.FechaUtil;
 import ar.edu.unju.escmi.tpfinal.dao.IClienteDao;
+import ar.edu.unju.escmi.tpfinal.dao.IReservaDao;
 import ar.edu.unju.escmi.tpfinal.dao.ISalonDao;
 import ar.edu.unju.escmi.tpfinal.dao.imp.ClienteDaoImp;
+import ar.edu.unju.escmi.tpfinal.dao.imp.ReservaDaoImp;
 import ar.edu.unju.escmi.tpfinal.dao.imp.SalonDaoImp;
 
 public class Main {
 	public static Scanner scanner = new Scanner(System.in);
 	public static IClienteDao clienteDao = new ClienteDaoImp();
 	public static ISalonDao salonDao = new SalonDaoImp();
-	
+	public static IReservaDao reservaDao = new ReservaDaoImp();
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		int opcion;
@@ -32,12 +37,16 @@ public class Main {
 				modificarCliente();
 				break;
 			case 4:
+				realizarPagoDeReserva();
 				break;
 			case 5:
+				realizarReserva();
 				break;
 			case 6:
+				consultarReservas();
 				break;
 			case 7:
+				consultarReserva();
 				break;
 			case 8:
 				consultarSalones();
@@ -173,38 +182,14 @@ public class Main {
 		clientes.forEach(System.out::println);
 	}
 	
-public static void modificarCliente() {
+	public static void modificarCliente() {
 		
-		List<Cliente> clientes = clienteDao.obtenerClientes();
-		
-		if(clientes.stream().filter(c -> c.isEstado() == true).count() == 0) {
+		if(clienteDao.obtenerClientes().stream().filter(c -> c.isEstado() == true).count() == 0) {
 			System.out.println("No hay clientes disponibles");
 			return;
 		}
 		
-		Cliente cliente = null;
-		boolean existe = false;
-		
-		clientes.forEach(cli -> {
-			if(cli.isEstado() == true) System.out.println(cli.getId()+") "+cli.getNombre()+ " "
-														+ cli.getApellido() + " "+ cli.getDni());
-		});
-		
-		long id = -1;
-		while(!existe) {
-			
-	        try {
-	        	id = ingresarNumeroEntero("Ingresar el id del cliente que desea modificar: ");
-				cliente = clienteDao.obtenerCliente(id);
-				existe=true;
-	        } catch (NoResultException e) {
-	            System.out.println("Cliente con ID " + id + " no encontrado.");
-	            throw e;
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	            System.out.println("Ocurrió un error al buscar el cliente.");
-	        }
-		}
+		Cliente cliente = seleccionarCliente("Ingresar el id del cliente que desea modificar: ");
 		
 		System.out.println("El cliente encontrado es: \n" + cliente.toString());
 		
@@ -242,6 +227,126 @@ public static void modificarCliente() {
 		}while(opcion != 4);
 		
 		clienteDao.modificarCliente(cliente);
+	}
+	
+	public static Cliente seleccionarCliente(String texto) {
+		Cliente cliente = null;
+		boolean existe = false;
+		long id = 0 ;
+		clienteDao.obtenerClientes().forEach(cli -> {
+			if(cli.isEstado() == true) System.out.println(cli.getId()+" - "+cli.getNombre()+ " "
+														+ cli.getApellido() + " "+ cli.getDni());
+		});
+		
+		while(!existe) {
+			
+	        try {
+	        	id = ingresarNumeroEntero(texto);
+				cliente = clienteDao.obtenerCliente(id);
+				existe=true;
+	        } catch (NoResultException e) {
+	            System.out.println("Cliente con ID " + id + " no encontrado.");
+	            throw e;
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            System.out.println("Ocurrió un error al buscar el cliente.");
+	        }
+		}
+		
+		return cliente;
+	}
+	
+	public static void realizarReserva() {
+		if(clienteDao.obtenerClientes().stream().filter(c -> c.isEstado() == true).count() == 0) {
+			System.out.println("No hay clientes disponibles para realizar una reserva");
+			return;
+		}
+		
+		Cliente cliente = seleccionarCliente("Ingrese el id cliente que realizará la reserva");
+		
+		LocalDate fechaReserva = null;
+	    boolean esValido = false;
+		while (!esValido) {
+	    	try {
+	    		String aux = ingresarString("Ingrese la fecha del prestamo en formato dd/MM/yyyy: ");
+	    		fechaReserva = FechaUtil.convertirStringLocalDate(aux);
+	    		esValido = true;
+	    	} catch (IllegalArgumentException e) {
+	    		System.out.println(e.getMessage());
+	    	}
+	    }
+		
+		
+		
+	}
+	
+	public static void realizarPagoDeReserva() {
+		if(reservaDao.obtenerReservas().stream().filter(r -> r.isEstado() == true && r.isCancelado() == false).count() > 0) {
+			
+			reservaDao.obtenerReservas().stream().filter(r -> r.isEstado() == true && r.isCancelado())
+			.forEach(r -> System.out.println("\nId: " + r.getId() + "\nFecha: " + r.getFecha() + "\nMonto Pagado: " + r.getMontoPagado()));
+			
+			boolean existe = false;
+			Reserva reserva = null;
+			long id = 0;
+			while(!existe) {
+				try {
+		        	id = ingresarNumeroEntero("Ingresar el id de la reserva que desea pagar: ");
+					reserva = reservaDao.obtenerReserva(id);
+					existe=true;
+		        } catch (NoResultException e) {
+		            System.out.println("Reserva con ID " + id + " no encontrado.");
+		            throw e;
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		            System.out.println("Ocurrió un error al buscar la Reserva.");
+		        }
+			}
+			
+			reservaDao.modificarReserva(reserva);
+		
+		}
+		else {
+			System.out.println("No hay reservas pendientes a pagar");
+		}
+	}
+	
+	
+	
+	public static void consultarReservas() {
+		if(reservaDao.obtenerReservas().stream().filter(r -> r.isEstado() == true).count() > 0) {
+			reservaDao.obtenerReservas().stream().filter(r -> r.isEstado() == true).forEach(System.out::println);
+		}
+		else System.out.println("No hay reservas disponibles");
+	}
+	
+	public static void consultarReserva() {
+		if(reservaDao.obtenerReservas().stream().filter(r -> r.isEstado() == true).count() > 0) {
+			
+			reservaDao.obtenerReservas().stream().filter(r -> r.isEstado() == true && r.isCancelado())
+			.forEach(r -> System.out.println("\nId: " + r.getId() + "\nFecha: " + r.getFecha() + "\nMonto Pagado: " + r.getMontoPagado()));
+			
+			boolean existe = false;
+			Reserva reserva = null;
+			long id = 0;
+			while(!existe) {
+				try {
+		        	id = ingresarNumeroEntero("Ingresar el id de la reserva que desea consultar: ");
+					reserva = reservaDao.obtenerReserva(id);
+					existe=true;
+		        } catch (NoResultException e) {
+		            System.out.println("Reserva con ID " + id + " no encontrado.");
+		            throw e;
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		            System.out.println("Ocurrió un error al buscar la Reserva.");
+		        }
+			}
+			reserva.mostrarDatos();
+		}
+		else {
+			System.out.println("No hay reservas disponibles");
+		}
 	}
 	
 	public static void consultarSalones() {
