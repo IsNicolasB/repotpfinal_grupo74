@@ -24,6 +24,7 @@ public class Main {
 		// TODO Auto-generated method stub
 		int opcion;
 		do {
+			precargarSalones();
 			menu();
 			opcion = ingresarNumeroEntero("Ingresar opcion: ");
 			switch (opcion) {
@@ -77,6 +78,12 @@ public class Main {
 				+ "8 - Consultar Salones.\n"
 				+ "9 - Consultar Servicios Adicionales.\n"
 				+ "10 - CERRAR PROGRAMA\n");
+	}
+	
+	public static void precargarSalones() {
+		salonDao.guardarSalon(new Salon("Cosmos", 60, false, 60000.0));
+		salonDao.guardarSalon(new Salon("Esmeralda", 20, false, 20000.0));
+		salonDao.guardarSalon(new Salon("Galaxy", 100, true, 150000.0));
 	}
 	
 	public static String ingresarString(String texto) {
