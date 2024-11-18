@@ -1,6 +1,7 @@
 package ar.edu.unju.escmi.tpfinal.dao.imp;
 
 import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
