@@ -144,6 +144,10 @@ public class Reserva {
 	public void setPagoAdelantado(double pagoAdelantado) {
 		this.pagoAdelantado = pagoAdelantado;
 	}
+	
+	public boolean isCancelado() {
+		return cancelado;
+	}
 
 	public boolean isEstado() {
 		return estado;
