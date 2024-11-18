@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import ar.edu.unju.escmi.tpfinal.entities.Cliente;
+import ar.edu.unju.escmi.tpfinal.exceptions.ClienteNoEncontradoException;
 import ar.edu.unju.escmi.tpfinal.dao.IClienteDao;
 import ar.edu.unju.escmi.tpfinal.dao.imp.ClienteDaoImp;
 
@@ -31,7 +32,7 @@ class ClienteTest {
 	
     @Test
     @Order(1)
-    void testGuardarCliente() {
+    void testGuardarCliente() throws ClienteNoEncontradoException {
 
         // Verificar que se guardó correctamente
         Cliente clienteGuardado = clienteDao.obtenerCliente(expected.getId());
@@ -42,7 +43,7 @@ class ClienteTest {
     
     @Test
     @Order(2)
-    void testModificarCliente() {
+    void testModificarCliente() throws ClienteNoEncontradoException {
     	
         // Modificar el cliente
         expected.setNombre("Daniel");
