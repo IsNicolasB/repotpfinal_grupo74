@@ -7,6 +7,7 @@ import javax.persistence.NoResultException;
 import ar.edu.unju.escmi.tpfinal.entities.Cliente;
 import ar.edu.unju.escmi.tpfinal.entities.Reserva;
 import ar.edu.unju.escmi.tpfinal.entities.Salon;
+import ar.edu.unju.escmi.tpfinal.exceptions.InvalidTimeRangeException;
 import ar.edu.unju.escmi.tpfinal.utils.FechaUtil;
 import ar.edu.unju.escmi.tpfinal.dao.IClienteDao;
 import ar.edu.unju.escmi.tpfinal.dao.IReservaDao;
@@ -23,8 +24,8 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		int opcion;
+		precargarSalones();
 		do {
-			precargarSalones();
 			menu();
 			opcion = ingresarNumeroEntero("Ingresar opcion: ");
 			switch (opcion) {
@@ -263,27 +264,89 @@ public class Main {
 		return cliente;
 	}
 	
+	public static Salon seleccionarSalon(String texto) {
+		Salon salon = null;
+		boolean existe = false;
+		long id = 0 ;
+		
+		consultarSalones();
+		
+		while(!existe) {
+			
+	        try {
+	        	id = ingresarNumeroEntero(texto);
+				salon = salonDao.obtenerSalon(id);
+				existe=true;
+	        } catch (NoResultException e) {
+	            System.out.println("Salon con ID: " + id + " no encontrado.");
+	            throw e;
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            System.out.println("Ocurrió un error al buscar el salon.");
+	        }
+		}
+		
+		return salon;
+	}
+	
+	
 	public static void realizarReserva() {
+		
+		Reserva reserva = new Reserva();
+		
 		if(clienteDao.obtenerClientes().stream().filter(c -> c.isEstado() == true).count() == 0) {
 			System.out.println("No hay clientes disponibles para realizar una reserva");
 			return;
 		}
 		
-		Cliente cliente = seleccionarCliente("Ingrese el id cliente que realizará la reserva");
+		Cliente cliente = seleccionarCliente("Ingrese el id cliente que realizará la reserva: ");
+		reserva.setCliente(cliente);
+		
+		Salon salon = seleccionarSalon("Ingrese el id del salon que quiere reservar: ");
+		reserva.setSalon(salon);
 		
 		LocalDate fechaReserva = null;
 	    boolean esValido = false;
+	    List<Reserva> reservas = reservaDao.obtenerReservas();
 		while (!esValido) {
 	    	try {
 	    		String aux = ingresarString("Ingrese la fecha del prestamo en formato dd/MM/yyyy: ");
-	    		fechaReserva = FechaUtil.convertirStringLocalDate(aux);
-	    		esValido = true;
+	    		LocalDate fecha = FechaUtil.convertirStringLocalDate(aux);
+	    		//Recorro las reservas activas, si el salón ya se reservó en esa fecha, se debe volver a ingresar la fecha
+	    		if(reservas.stream().filter(r-> r.isEstado() == true && r.getFecha().equals(fecha) && r.getSalon().equals(salon)).count() == 0) {
+	    			esValido = true;
+	    			fechaReserva = fecha;
+	    		}
+	    		else System.out.println("El salón ya está reservado en esa fecha, ingrese otra");
 	    	} catch (IllegalArgumentException e) {
 	    		System.out.println(e.getMessage());
 	    	}
 	    }
 		
+		reserva.setFecha(fechaReserva);
 		
+		boolean horasValidas = false;
+
+        while (!horasValidas) {
+            try {
+                System.out.print("Ingrese la hora de inicio (formato HH:mm): ");
+                String horaInicio = scanner.next();
+
+                System.out.print("Ingrese la hora de fin (formato HH:mm): ");
+                String horaFin = scanner.next();
+
+                reserva.setHoras(horaInicio, horaFin);
+
+                // Si no lanza ningúna excepción, las horas son válidas
+                horasValidas = true;
+                System.out.println("Horas asignadas correctamente.");
+            } catch (InvalidTimeRangeException | IllegalArgumentException e) {
+            	
+                System.err.println("Error: " + e.getMessage());
+                System.out.println("Por favor, ingrese las horas nuevamente.");
+                scanner.nextLine();
+            }
+        }
 		
 	}
 	
@@ -317,8 +380,6 @@ public class Main {
 			System.out.println("No hay reservas pendientes a pagar");
 		}
 	}
-	
-	
 	
 	public static void consultarReservas() {
 		if(reservaDao.obtenerReservas().stream().filter(r -> r.isEstado() == true).count() > 0) {
@@ -361,3 +422,4 @@ public class Main {
 		salones.stream().forEach(System.out::println);
 	}
 }
+
