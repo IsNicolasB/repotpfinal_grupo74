@@ -25,6 +25,7 @@ public class Main {
 		// TODO Auto-generated method stub
 		int opcion;
 		precargarSalones();
+		precargarServiciosAdicionales();
 		do {
 			menu();
 			opcion = ingresarNumeroEntero("Ingresar opcion: ");
@@ -421,5 +422,12 @@ public class Main {
 		List<Salon> salones = salonDao.obtenerSalones();
 		salones.stream().forEach(System.out::println);
 	}
+	public static void precargarServiciosAdicionales() {
+		servicioAdicionalDao.guardarServicioAdicional(new ServicioAdicional("camara 360",1000,true));
+		servicioAdicionalDao.guardarServicioAdicional(new ServicioAdicional("cabina de fotos",2000,true));
+		servicioAdicionalDao.guardarServicioAdicional(new ServicioAdicional("filmacion",500,true));
+		servicioAdicionalDao.guardarServicioAdicional(new ServicioAdicional("pintacaritas",500,true));
+	}
+
 }
 
