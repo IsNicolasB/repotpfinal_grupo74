@@ -28,9 +28,8 @@ public class Salon {
 		
 	}
 
-	public Salon(Long id, String nombre, int capacidad, boolean conPileta, double precio) {
+	public Salon(String nombre, int capacidad, boolean conPileta, double precio) {
 		super();
-		this.id = id;
 		this.nombre = nombre;
 		this.capacidad = capacidad;
 		this.conPileta = conPileta;
@@ -39,10 +38,6 @@ public class Salon {
 
 	public Long getId() {
 		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public String getNombre() {
