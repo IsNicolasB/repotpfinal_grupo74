@@ -7,20 +7,24 @@ import javax.persistence.NoResultException;
 import ar.edu.unju.escmi.tpfinal.entities.Cliente;
 import ar.edu.unju.escmi.tpfinal.entities.Reserva;
 import ar.edu.unju.escmi.tpfinal.entities.Salon;
+import ar.edu.unju.escmi.tpfinal.entities.ServicioAdicional;
 import ar.edu.unju.escmi.tpfinal.exceptions.InvalidTimeRangeException;
 import ar.edu.unju.escmi.tpfinal.utils.FechaUtil;
 import ar.edu.unju.escmi.tpfinal.dao.IClienteDao;
 import ar.edu.unju.escmi.tpfinal.dao.IReservaDao;
 import ar.edu.unju.escmi.tpfinal.dao.ISalonDao;
+import ar.edu.unju.escmi.tpfinal.dao.IServicioAdicionalDao;
 import ar.edu.unju.escmi.tpfinal.dao.imp.ClienteDaoImp;
 import ar.edu.unju.escmi.tpfinal.dao.imp.ReservaDaoImp;
 import ar.edu.unju.escmi.tpfinal.dao.imp.SalonDaoImp;
+import ar.edu.unju.escmi.tpfinal.dao.imp.ServicioAdicionalDaoImp;
 
 public class Main {
 	public static Scanner scanner = new Scanner(System.in);
 	public static IClienteDao clienteDao = new ClienteDaoImp();
 	public static ISalonDao salonDao = new SalonDaoImp();
 	public static IReservaDao reservaDao = new ReservaDaoImp();
+	public static IServicioAdicionalDao servicioAdicionalDao = new ServicioAdicionalDaoImp();
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		int opcion;
@@ -177,7 +181,7 @@ public class Main {
 		String nombre = ingresarString( "Registrar el nombre del Cliente: ");
 		String apellido = ingresarString( "Registrar el apellido del Cliente: ");
 		String domicilio = ingresarStringConEspacios( "Registrar el domicilio del Cliente: ");
-		String telefono = ingresarStringConEspacios( "Registrar el telefono del cliente");
+		String telefono = ingresarString( "Registrar el telefono del cliente: ");
 		Long dni = ingresarNumeroEnteroLargo( "Registrar el dni del Cliente: " );
 		
 		Cliente cliente = new Cliente(dni, nombre, apellido, domicilio, telefono, true);
@@ -226,6 +230,7 @@ public class Main {
 			case 4:
 				String telefono = ingresarStringConEspacios("Registrar el nuevo telefono del Cliente: ");
 				cliente.setTelefono(telefono);
+				break;
 			case 5 :
 				System.out.println("Se finalizó la modicación");
 				break;
@@ -233,7 +238,7 @@ public class Main {
 				System.out.println("Opción no válida");
 				break;
 			}
-		}while(opcion != 4);
+		}while(opcion != 5);
 		
 		clienteDao.modificarCliente(cliente);
 	}
@@ -349,6 +354,24 @@ public class Main {
             }
         }
 		
+        boolean pagoValido = false;
+        double pagoAdelantado = 0.00;
+        
+        while (!pagoValido)  {
+        	System.out.println("Monto Total: "+salon.getPrecio());
+        	System.out.println("Ingrese el monto que pagara por adelantado, este debe ser menor que el total: ");
+        	pagoAdelantado = scanner.nextDouble();
+        	
+        	if (pagoAdelantado < salon.getPrecio()) pagoValido = true;
+        	else System.out.println("¡ Ingrese un monto menor a "+salon.getPrecio()+" !");
+        }
+        
+        reserva.setPagoAdelantado(pagoAdelantado);
+        reserva.setEstado(true);
+        
+        reservaDao.guardarReserva(reserva);
+        
+        System.out.println("¡ Se realizo la reserva correctamente !");
 	}
 	
 	public static void realizarPagoDeReserva() {
@@ -364,7 +387,11 @@ public class Main {
 				try {
 		        	id = ingresarNumeroEntero("Ingresar el id de la reserva que desea pagar: ");
 					reserva = reservaDao.obtenerReserva(id);
-					existe=true;
+					
+					if (reserva == null) {
+		                System.out.println("Reserva con ID " + id + " no encontrada. Intente nuevamente.");
+		            } else existe =true;
+					
 		        } catch (NoResultException e) {
 		            System.out.println("Reserva con ID " + id + " no encontrado.");
 		            throw e;
@@ -374,8 +401,9 @@ public class Main {
 		        }
 			}
 			
-			reservaDao.modificarReserva(reserva);
-		
+            	reserva.setMontoPagado(reserva.getSalon().getPrecio());
+            	reservaDao.modificarReserva(reserva);
+	
 		}
 		else {
 			System.out.println("No hay reservas pendientes a pagar");
