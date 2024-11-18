@@ -13,6 +13,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Table;
 
+import ar.edu.unju.escmi.tpfinal.exceptions.InvalidTimeRangeException;
+import ar.edu.unju.escmi.tpfinal.utils.TimeUtil;
+
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -109,16 +112,8 @@ public class Reserva {
 		return horaInicio;
 	}
 
-	public void setHoraInicio(LocalTime horaInicio) {
-		this.horaInicio = horaInicio;
-	}
-
 	public LocalTime getHoraFin() {
 		return horaFin;
-	}
-
-	public void setHoraFin(LocalTime horaFin) {
-		this.horaFin = horaFin;
 	}
 
 	public double getMontoPagado() {
@@ -142,13 +137,14 @@ public class Reserva {
 	}
 
 	public void setPagoAdelantado(double pagoAdelantado) {
+		this.montoPagado = pagoAdelantado;
 		this.pagoAdelantado = pagoAdelantado;
 	}
 	
 	public boolean isCancelado() {
 		return cancelado;
 	}
-
+	
 	public boolean isEstado() {
 		return estado;
 	}
@@ -200,5 +196,38 @@ public class Reserva {
 		 this.montoPagado += monto;
 		 this.cancelado = calcularPagoPendiente() == 0 ? true : false;
 	 }
+	 
+	 public void setHoras(String inicio, String fin) {
+	        this.horaInicio = TimeUtil.parseTime(inicio);
+	        this.horaFin = TimeUtil.parseTime(fin);    
+	        validarHoras(); 
+	    }
+	 
+	 private void validarHoras() {
+	        if (!this.horaInicio.isBefore(this.horaFin)) {
+	            throw new InvalidTimeRangeException(
+	                "La hora de inicio debe ser anterior a la hora de fin. Inicio: " 
+	                + this.horaInicio + ", Fin: " + this.horaFin
+	            );
+	        }
+
+	        Duration duracion = Duration.between(this.horaInicio, this.horaFin);
+	        if (duracion.toHours() < 4) {
+	            throw new InvalidTimeRangeException(
+	                "La diferencia entre la hora de inicio y la hora de fin debe ser de al menos 4 horas. "
+	                + "Inicio: " + this.horaInicio + ", Fin: " + this.horaFin + ", Duración: " + duracion.toHours() + " horas."
+	            );
+	        }
+	        
+	        LocalTime limiteInferior = LocalTime.of(10, 0); // 10:00 AM
+	        LocalTime limiteSuperior = LocalTime.of(23, 0); // 11:00 PM
+	        
+	        if (this.horaInicio.isBefore(limiteInferior) || this.horaFin.isAfter(limiteSuperior)) {
+	            throw new InvalidTimeRangeException(
+	                "Las horas deben estar entre las 10:00 AM y las 11:00 PM. "
+	                + "Inicio: " + this.horaInicio + ", Fin: " + this.horaFin
+	            );
+	        }
+	    }
 	 
 }
