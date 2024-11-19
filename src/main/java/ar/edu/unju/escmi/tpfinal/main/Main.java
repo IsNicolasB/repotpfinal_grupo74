@@ -29,6 +29,7 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		int opcion; 
+		precargarClientes();
 		precargarSalones();
 		precargarServiciosAdicionales();
 		do {
@@ -60,6 +61,7 @@ public class Main {
 				consultarSalones();
 				break;
 			case 9:
+				consultarServiciosAdicionales();
 				break;
 			case 10:
 				System.out.println("*** CERRANDO PROGRAMA ***");
@@ -192,7 +194,7 @@ public class Main {
 	
 	public static void registrarCliente() {
 		
-		String nombre = ingresarString( "Registrar el nombre del Cliente: ");
+		String nombre = ingresarStringConEspacios( "Registrar el nombre del Cliente: ");
 		String apellido = ingresarString( "Registrar el apellido del Cliente: ");
 		String domicilio = ingresarStringConEspacios( "Registrar el domicilio del Cliente: ");
 		String telefono = ingresarString( "Registrar el telefono del cliente: ");
