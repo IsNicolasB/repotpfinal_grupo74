@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -32,6 +30,7 @@ class ReservaTest {
     static private IReservaDao reservaDao = new ReservaDaoImp();
     static private IClienteDao clienteDao = new ClienteDaoImp();
     static private ISalonDao salonDao = new SalonDaoImp();
+    static private IServicioAdicionalDao servicioAdicionalDao = new ServicioAdicionalDaoImp();
     static private Reserva reservaExpected;
     
     @BeforeAll
@@ -41,17 +40,15 @@ class ReservaTest {
     	clienteDao.guardarCliente(cliente);
     	Salon salon = new Salon("Galaxy", 0, false, 20000);
     	salonDao.guardarSalon(salon);
-        // Crear servicios adicionales simulados
-        List<ServicioAdicional> servicios = new ArrayList<ServicioAdicional>();
-        ServicioAdicional servicio1 = new ServicioAdicional("Decoración", 5000, true);
         
-        ServicioAdicional servicio2 = new ServicioAdicional("Catering", 5000, true);
-        servicios.add(servicio1);
-        servicios.add(servicio2);
-
+		// Crear servicios adicionales simulados
+    	servicioAdicionalDao.guardarServicioAdicional(new ServicioAdicional("Camara 360",1000,true));
+		servicioAdicionalDao.guardarServicioAdicional(new ServicioAdicional("Cabina de fotos",2000,true));
+		servicioAdicionalDao.guardarServicioAdicional(new ServicioAdicional("Filmacion",500,true));
+		servicioAdicionalDao.guardarServicioAdicional(new ServicioAdicional("Pintacaritas",500,true));
         // Configurar reserva
         reservaExpected = new Reserva(cliente, salon, LocalDate.of(2024, 11, 5),
-                LocalTime.of(14, 0), LocalTime.of(20, 0), servicios, 10000, false);
+                LocalTime.of(14, 0), LocalTime.of(20, 0), servicioAdicionalDao.obtenerServiciosAdicionales(), 10000, false);
         
         reservaDao.guardarReserva(reservaExpected);
     }
@@ -74,14 +71,14 @@ class ReservaTest {
     @Order(3)
     void testCalcularMontoTotal() {
         double montoTotal = reservaExpected.calcularMontoTotal();
-        assertEquals(50000, montoTotal, "El monto total debería incluir el precio del salón, el costo extendido y el precio de los servicios.");
+        assertEquals(44000, montoTotal, "El monto total debería incluir el precio del salón, el costo extendido y el precio de los servicios.");
     }
 
     @Test
     @Order(4)
     void testCalcularPagoPendiente() {
         double pagoPendiente = reservaExpected.calcularPagoPendiente();
-        assertEquals(40000, pagoPendiente, "El pago pendiente debería ser la diferencia entre el monto total y lo pagado.");
+        assertEquals(34000, pagoPendiente, "El pago pendiente debería ser la diferencia entre el monto total y lo pagado.");
     }
     
     @Test
@@ -89,9 +86,9 @@ class ReservaTest {
     void testRealizarPago() {
     	Reserva reservaTest = reservaDao.obtenerReserva(reservaExpected.getId());
     	reservaTest.realizarPago(10000);
-    	assertEquals(30000, reservaTest.calcularPagoPendiente(), "El pago pendiente debería ser 30000");
+    	assertEquals(24000, reservaTest.calcularPagoPendiente(), "El pago pendiente debería ser 24000");
     	assertEquals(20000, reservaTest.getMontoPagado(), "El monto pagado debería ser 20000");
-    	reservaTest.realizarPago(30000);
+    	reservaTest.realizarPago(24000);
     	assertEquals(reservaTest.isCancelado(), true, "El pago ya debería estar cancelado");
     	reservaExpected = reservaTest;
     	reservaDao.modificarReserva(reservaTest);
@@ -102,5 +99,6 @@ class ReservaTest {
     void testVerificarCambios() {
     	assertEquals(reservaExpected, reservaDao.obtenerReserva(reservaExpected.getId()), "No se guardaron los cambios modificados");
     }
+    
 }
 
