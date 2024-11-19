@@ -9,6 +9,7 @@ import ar.edu.unju.escmi.tpfinal.entities.Cliente;
 import ar.edu.unju.escmi.tpfinal.entities.Reserva;
 import ar.edu.unju.escmi.tpfinal.entities.Salon;
 import ar.edu.unju.escmi.tpfinal.entities.ServicioAdicional;
+import ar.edu.unju.escmi.tpfinal.exceptions.ClienteNoEncontradoException;
 import ar.edu.unju.escmi.tpfinal.exceptions.InvalidTimeRangeException;
 import ar.edu.unju.escmi.tpfinal.utils.FechaUtil;
 import ar.edu.unju.escmi.tpfinal.dao.IClienteDao;
@@ -274,12 +275,9 @@ public class Main {
 	        	id = ingresarNumeroEntero(texto);
 				cliente = clienteDao.obtenerCliente(id);
 				existe=true;
-	        } catch (NoResultException e) {
+	        } catch (ClienteNoEncontradoException e) {
 	            System.out.println("Cliente con ID " + id + " no encontrado.");
-	            throw e;
-	        } catch (Exception e) {
 	            e.printStackTrace();
-	            System.out.println("Ocurrió un error al buscar el cliente.");
 	        }
 		}
 		
