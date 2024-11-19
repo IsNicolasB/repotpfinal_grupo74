@@ -174,18 +174,19 @@ public class Reserva {
 	 }
 	 
 	 public void mostrarDatos() {
-		 System.out.println("-------------------------------");
+		 System.out.println("------------------------------------------------");
 		 System.out.println("Reserva id: " + id 
 				 		+ "\nCliente: " + this.cliente.getNombre() + " " + cliente.getApellido() + ", DNI: " + cliente.getDni()
 				 		+ "\nSalon: " + salon.getNombre() + ", Precio: " + salon.getPrecio());
-		 System.out.println("-------------------------------" + "\nServicios Adicionales: ");
+		 System.out.println("------------------------------------------------" + "\nServicios Adicionales: ");
 		 serviciosAdicionales.forEach(sv -> System.out.println(sv.getDescripcion() + ", Precio: " + sv.getPrecio()));
-		 System.out.println("-------------------------------");
+		 System.out.println("------------------------------------------------");
 		 System.out.println("Fecha de Reserva: " + fecha 
 				 			+ "\nHora de Inicio: " + horaInicio + ", Hora de Finalización: " + horaFin
+				 			+ "\nMonto Total: " + calcularMontoTotal() +", Monto Pagado: " + montoPagado
 				 			+ "\nEstado del Pago: " + (cancelado == true ? "CANCELADO" : "PAGO PENDIENTE")
 				 			+ "\nEstado de la Resreva: " + (estado == true ? "ACTIVA" : "INACTIVA"));
-		 System.out.println("-------------------------------");
+		 System.out.println("------------------------------------------------");
 	 }
 
 	 public double calcularPagoPendiente() {
