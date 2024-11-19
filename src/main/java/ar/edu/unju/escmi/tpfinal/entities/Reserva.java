@@ -5,10 +5,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Table;
@@ -18,8 +16,9 @@ import ar.edu.unju.escmi.tpfinal.utils.TimeUtil;
 
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 @Entity
 @Table(name = "reservas")
@@ -49,9 +48,14 @@ public class Reserva {
 	 @Column(name = "res_monto_pagado")
 	 private double montoPagado;
 
-	 @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+	 @ManyToMany()
+	 @JoinTable(
+	     name = "reserva_servicio",
+	     joinColumns = @JoinColumn(name = "res_id"),
+	     inverseJoinColumns = @JoinColumn(name = "serv_id")
+	 )
 	 private List<ServicioAdicional> serviciosAdicionales;
-
+	 
 	 @Column(name = "res_pago_adelantado")
 	 private double pagoAdelantado;
 
@@ -137,7 +141,7 @@ public class Reserva {
 	}
 
 	public void setPagoAdelantado(double pagoAdelantado) {
-		this.montoPagado = pagoAdelantado;
+		this.montoPagado += pagoAdelantado;
 		this.pagoAdelantado = pagoAdelantado;
 	}
 	
@@ -170,18 +174,18 @@ public class Reserva {
 	 }
 	 
 	 public void mostrarDatos() {
-		 System.out.println(toString());
-	 }
-	 
-	 @Override
-	 public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("\nId: ").append(id).append("\nCliente: ").append(cliente).append("\nSalon: ").append(salon)
-				.append("\nFecha: ").append(fecha).append("\nHoraInicio: ").append(horaInicio).append("\nHoraFinal: ")
-				.append(horaFin).append("\nMontoPagado: ").append(montoPagado).append("\nPagoAdelantado: ")
-				.append(pagoAdelantado).append("\nCancelado: ").append(cancelado == true ? "CANCELADO" : "PAGO PENDIENTE")
-				.append("\nEstado: ").append(estado);
-		return builder.toString();
+		 System.out.println("-------------------------------");
+		 System.out.println("Reserva id: " + id 
+				 		+ "\nCliente: " + this.cliente.getNombre() + " " + cliente.getApellido() + ", DNI: " + cliente.getDni()
+				 		+ "\nSalon: " + salon.getNombre() + ", Precio: " + salon.getPrecio());
+		 System.out.println("-------------------------------" + "\nServicios Adicionales: ");
+		 serviciosAdicionales.forEach(sv -> System.out.println(sv.getDescripcion() + ", Precio: " + sv.getPrecio()));
+		 System.out.println("-------------------------------");
+		 System.out.println("Fecha de Reserva: " + fecha 
+				 			+ "\nHora de Inicio: " + horaInicio + ", Hora de Finalización: " + horaFin
+				 			+ "\nEstado del Pago: " + (cancelado == true ? "CANCELADO" : "PAGO PENDIENTE")
+				 			+ "\nEstado de la Resreva: " + (estado == true ? "ACTIVA" : "INACTIVA"));
+		 System.out.println("-------------------------------");
 	 }
 
 	 public double calcularPagoPendiente() {
