@@ -276,8 +276,7 @@ public class Main {
 				cliente = clienteDao.obtenerCliente(id);
 				existe=true;
 	        } catch (ClienteNoEncontradoException e) {
-	            System.out.println("Cliente con ID " + id + " no encontrado.");
-	            e.printStackTrace();
+	        	System.out.println("ERROR: " + e.getMessage());
 	        }
 		}
 		

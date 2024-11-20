@@ -202,13 +202,13 @@ public class Reserva {
 		 this.cancelado = calcularPagoPendiente() == 0 ? true : false;
 	 }
 	 
-	 public void setHoras(String inicio, String fin) {
+	 public void setHoras(String inicio, String fin) throws InvalidTimeRangeException {
 	        this.horaInicio = TimeUtil.parseTime(inicio);
 	        this.horaFin = TimeUtil.parseTime(fin);    
 	        validarHoras(); 
 	    }
 	 
-	 private void validarHoras() {
+	 private void validarHoras() throws InvalidTimeRangeException {
 	        if (!this.horaInicio.isBefore(this.horaFin)) {
 	            throw new InvalidTimeRangeException(
 	                "La hora de inicio debe ser anterior a la hora de fin. Inicio: " 
